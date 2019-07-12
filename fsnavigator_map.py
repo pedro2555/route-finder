@@ -124,13 +124,16 @@ class Node:
         self.via_type = via_type
 
     def __eq__(self, other):
-        return self.name == other.name if isinstance(other, Node) else False
+        if not isinstance(other, Node):
+            return false
+
+        return self.name == other.name and self.x == other.x and self.y == other.y
 
     def __gt__(self, other):
         return self.name > other.name
 
     def __hash__(self):
-        return self.name.__hash__() * 13
+        return int(self.name.__hash__() * self.x**5 * self.y * 13)
 
     def __repr__(self):
         return self.name
