@@ -3,6 +3,7 @@ import webbrowser
 from time import time
 import pickle
 import click
+import subprocess
 
 from fsnavigator_map import FsNavigatorMap
 from route_finder import RouteFinder
@@ -61,5 +62,19 @@ def route(start, end, open):
     click.echo(f'ROUTE: {route.atc_route}')
     webbrowser.open(f'https://skyvector.com/?fpl={route.atc_route}')
 
+@cli.command()
+@click.option('--host', '-h', default='0.0.0.0', help='The address the web app will listen in.')
+@click.option('--port', '-p', default=5000, help='The TCP port to listen to')
+@click.option('--debug', '-d', default=False, is_flag=True, help='Set enviroment mode')
+def run(host, port, debug):
+    """Runs a development web server."""
+    if debug:
+        from flask_web import app
+        app.run(host=host, port=port, debug=debug)
+    else:
+        bind = '%s:%s' % (host, port)
+        subprocess.call(['gunicorn', 'flask_web:app', '--bind', bind, '--log-file=-'])
+
+        
 if __name__ == '__main__':
     cli()
